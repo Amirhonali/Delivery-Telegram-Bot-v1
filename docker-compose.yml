@@ -1,0 +1,54 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:16
+    restart: always
+    environment:
+      POSTGRES_DB: food_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 4554
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  django:
+    build:
+      context: .
+      dockerfile: Dockerfile.django
+    restart: always
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./admin_panel:/app
+      - ./wwwroot:/app/wwwroot
+    environment:
+      DB_NAME: food_db
+      DB_USER: postgres
+      DB_PASSWORD: 4554
+      DB_HOST: db
+      DB_PORT: 5432
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile.bot
+    restart: always
+    volumes:
+      - ./bot:/app
+    environment:
+      DB_NAME: food_db
+      DB_USER: postgres
+      DB_PASSWORD: 4554
+      DB_HOST: db
+      DB_PORT: 5432
+      BOT_TOKEN: "тут_твой_telegram_token"
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:

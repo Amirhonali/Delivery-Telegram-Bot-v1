@@ -1,0 +1,18 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# ставим зависимости
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# копируем проект
+COPY admin_panel/ /app
+
+# создаём папку для медиа и статики
+RUN mkdir -p /app/wwwroot
+
+# указываем переменные окружения
+ENV PYTHONUNBUFFERED=1
+
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
