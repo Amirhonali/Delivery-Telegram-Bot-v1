@@ -1,15 +1,24 @@
 import asyncio
-from aiogram import Bot, Router, F, Dispatcher
-from aiogram.filters import Command
-from aiogram.fsm.state import StatesGroup, State
-from aiogram.fsm.context import FSMContext
-from aiogram.types import (Message, FSInputFile, KeyboardButton,
-                           ReplyKeyboardMarkup,InlineKeyboardMarkup, InlineKeyboardButton)
+import logging
+from aiogram import Bot, Dispatcher
+from aiogram.client.default import DefaultBotProperties
+from config import BOT_TOKEN
+from handlers import start, order, cart
 
+logging.basicConfig(level=logging.INFO)
 
-bot = Bot("")
-rr = Router()
-dp = Dispatcher()
-dp.include_router(rr)
-class Register(StatesGroup):
-    main_menu = State()
+async def main():
+    bot = Bot(
+        token=BOT_TOKEN,
+        default=DefaultBotProperties(parse_mode="HTML")
+    )
+    dp = Dispatcher()
+
+    dp.include_router(start.router)
+    dp.include_router(order.router)
+    dp.include_router(cart.router)
+
+    await dp.start_polling(bot)
+
+if __name__ == "__main__":
+    asyncio.run(main())
