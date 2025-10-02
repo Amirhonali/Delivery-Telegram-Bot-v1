@@ -20,23 +20,16 @@ async def callbacks(call: types.CallbackQuery):
 
     if action == "inc":
         qty += 1
-        await call.message.edit_reply_markup(
-            reply_markup=product_keyboard(prod_id, qty)
-        )
+        await call.message.edit_reply_markup(reply_markup=product_keyboard(prod_id, qty))
     elif action == "dec" and qty > 1:
         qty -= 1
-        await call.message.edit_reply_markup(
-            reply_markup=product_keyboard(prod_id, qty)
-        )
+        await call.message.edit_reply_markup(reply_markup=product_keyboard(prod_id, qty))
     elif action == "add":
         prod = get_product(prod_id)
         add_to_cart(call.from_user.id, prod[0], prod[1], qty, float(prod[2]))
         await call.answer("✅ Savatchaga qo‘shildi")
     elif action == "back_main":
-        await call.message.answer(
-            "🏠 Bosh menyu:",
-            reply_markup=menu_keyboard()
-        )
+        await call.message.answer("🏠 Bosh menyu:", reply_markup=menu_keyboard())
     elif action == "clear":
         clear_cart(call.from_user.id)
         await call.message.answer("🗑 Savat tozalandi")
@@ -45,8 +38,13 @@ async def callbacks(call: types.CallbackQuery):
         if not cart:
             await call.message.answer("❌ Savat bo‘sh")
             return
-        user_id = get_or_create_user(call.from_user.id, call.from_user.username, call.from_user.first_name, call.from_user.last_name)
-        order_id = save_order(user_id, [(p, q, price) for p, _, q, price in cart])
+        user_id = get_or_create_user(
+            call.from_user.id,
+            call.from_user.username,
+            call.from_user.first_name,
+            call.from_user.last_name
+        )
+        order_id = save_order(user_id, [(prod_id, name, qty, price) for prod_id, name, qty, price in cart])
         await call.message.answer(f"✅ Buyurtma #{order_id} qabul qilindi!")
         clear_cart(call.from_user.id)
 

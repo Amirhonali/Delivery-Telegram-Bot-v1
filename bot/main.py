@@ -2,6 +2,7 @@ import asyncio
 import logging
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
+
 from config import BOT_TOKEN
 from handlers import start, order, cart
 

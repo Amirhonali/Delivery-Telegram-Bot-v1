@@ -1,10 +1,9 @@
 import os
-
 from aiogram import Router, types
 from aiogram.fsm.context import FSMContext
 
 from bot.database import get_categories, get_products_by_category
-from bot.keyboards import categories_keyboard, product_keyboard
+from bot.keyboards import categories_keyboard, product_keyboard, menu_keyboard
 from bot.states import OrderStates
 
 router = Router()
@@ -18,7 +17,7 @@ async def order_start(message: types.Message, state: FSMContext):
 @router.message(OrderStates.choosing_category)
 async def choose_category(message: types.Message, state: FSMContext):
     if message.text == "🔙 Orqaga":
-        await message.answer("⬅️ Ortga qaytdingiz.")
+        await message.answer("🏠 Bosh menyu:", reply_markup=menu_keyboard())
         await state.clear()
         return
 

@@ -6,18 +6,16 @@ import os
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MEDIA_ROOT = os.path.join(BASE_DIR, "wwwroot", "images")
 
-
 def connect():
-    conn = psycopg2.connect(
-        user='postgres',
-        password='4554',
-        host='localhost',
-        database='food_db',
-        port='5433'
+    return psycopg2.connect(
+        user="postgres",
+        password="4554",
+        host="localhost",
+        database="food_db",
+        port="5433"
     )
-    return conn
 
-
+# --- Category ---
 def get_categories():
     conn = connect()
     cursor = conn.cursor()
@@ -26,7 +24,7 @@ def get_categories():
     conn.close()
     return rows
 
-
+# --- Products ---
 def get_products_by_category(category_id):
     conn = connect()
     cursor = conn.cursor()
@@ -43,7 +41,20 @@ def get_products_by_category(category_id):
         result.append((prod_id, name, price, full_path))
     return result
 
+def get_product(prod_id):
+    conn = connect()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, name, price, image FROM apps_product WHERE id = %s;", (prod_id,))
+    row = cursor.fetchone()
+    conn.close()
+    if not row:
+        return None
 
+    prod_id, name, price, image = row
+    full_path = os.path.join(MEDIA_ROOT, str(image)) if image else None
+    return (prod_id, name, price, full_path)
+
+# --- User ---
 def get_or_create_user(telegram_id, username=None, first_name=None, last_name=None):
     conn = connect()
     cursor = conn.cursor()
@@ -63,21 +74,7 @@ def get_or_create_user(telegram_id, username=None, first_name=None, last_name=No
     conn.close()
     return user_id
 
-
-def get_product(prod_id):
-    conn = connect()
-    cursor = conn.cursor()
-    cursor.execute("SELECT id, name, price, image FROM apps_product WHERE id = %s;", (prod_id,))
-    row = cursor.fetchone()
-    conn.close()
-    if not row:
-        return None
-
-    prod_id, name, price, image = row
-    full_path = os.path.join(MEDIA_ROOT, str(image)) if image else None
-    return (prod_id, name, price, full_path)
-
-
+# --- Order ---
 def save_order(user_id, cart):
     conn = connect()
     cursor = conn.cursor()
